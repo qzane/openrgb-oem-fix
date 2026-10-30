@@ -1,5 +1,5 @@
 # openrgb-oem-fix
-Tested in hp OMEN 45L with kingston Fury RGB RAM
+Tested on hp OMEN 45L with kingston Fury RGB RAM
 
 Turn RAM RGB off on Linux desktops where OpenRGB sees nothing at all.
 
