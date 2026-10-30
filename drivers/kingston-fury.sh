@@ -39,8 +39,8 @@ kf_sleep() { sleep "$KF_DELAY_S"; }
 
 # kf_write ADDR REG VALUE
 kf_write() {
-    local addr=$1 reg=$2 val=$3 attempt
-    for attempt in 1 2 3; do
+    local addr=$1 reg=$2 val=$3
+    for _ in 1 2 3; do
         if i2cset -y "$KF_BUS" "$addr" "$reg" "$val" b >/dev/null 2>&1; then
             kf_sleep
             return 0
@@ -54,8 +54,8 @@ kf_write() {
 
 # kf_read_byte ADDR REG -> prints the data byte
 kf_read_byte() {
-    local addr=$1 reg=$2 raw attempt
-    for attempt in 1 2 3; do
+    local addr=$1 reg=$2 raw
+    for _ in 1 2 3; do
         if raw=$(i2cget -y "$KF_BUS" "$addr" "$reg" w 2>/dev/null); then
             printf '%d\n' $(( (raw >> 8) & 0xFF ))
             return 0

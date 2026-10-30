@@ -78,12 +78,18 @@ smbus_spd_byte() {
         od -An -tu1 | tr -d ' \n'
 }
 
-# Read the DDR5/DDR4 module part number from SPD (offset 0x209, 30 bytes is
-# the DDR5 DDR5 SPD part number area; the classic JEDEC area is 0x209 too).
+# Read the module part number from SPD: 0x209 for DDR5 (spd5118), 0x145 for
+# DDR4 (ee1004). Returns the trimmed ASCII string.
 smbus_spd_part() {
-    local bus=$1 addr=$2 d
+    local bus=$1 addr=$2 d name offset
     d=/sys/bus/i2c/devices/"$bus"-00${addr#0x}
     [[ -r $d/eeprom ]] || return 1
-    dd if="$d/eeprom" bs=1 skip=521 count=30 status=none 2>/dev/null |
+    name=""
+    [[ -r $d/name ]] && name=$(<"$d/name")
+    case $name in
+        ee1004) offset=325 ;;   # 0x145, JEDEC DDR4 part number
+        *)      offset=521 ;;   # 0x209, DDR5 SPD manufacturer area
+    esac
+    dd if="$d/eeprom" bs=1 skip="$offset" count=30 status=none 2>/dev/null |
         tr -d '\0' | sed 's/[[:space:]]*$//'
 }

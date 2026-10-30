@@ -111,8 +111,8 @@ if [[ -n $BUS ]] && (( ${#SPD[@]} > 0 )) && is_root; then
         if [[ $model_ok == *" $(printf '0x%02x' "$model") "* ]]; then
             continue
         fi
-        note "model 0x$(printf '%02x' "$model") is rejected by packaged OpenRGB 0.9 builds"
-        note "the Kingston fallback driver (--driver kingston) covers it"
+        note "model $(printf '0x%02x' "$model") is not in the OpenRGB 0.9 whitelist (0x10/0x11/0x12/0x15)"
+        note "if OpenRGB does not list this stick, use the fallback: sudo bin/rgb-off.sh --driver kingston"
     done
 elif [[ -n $BUS ]] && ! is_root; then
     note "SPD model check skipped (needs root: sudo bin/diagnose.sh)"

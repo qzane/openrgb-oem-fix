@@ -64,6 +64,7 @@ ok_kingston=0
 
 if [[ $DRIVER == auto || $DRIVER == openrgb ]]; then
     if or_available; then
+        # shellcheck disable=SC2034  # read by drivers/openrgb.sh
         OR_DRY_RUN=$DRY_RUN
         if or_apply_off; then
             ok_openrgb=1

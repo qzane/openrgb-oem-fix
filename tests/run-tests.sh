@@ -76,6 +76,7 @@ export PATH="$WORK/bin:$PATH"
 # --- openrgb driver: only DRAM devices are selected -----------------------
 # shellcheck source=../drivers/openrgb.sh
 . "$REPO/drivers/openrgb.sh"
+# shellcheck disable=SC2034  # consumed by the sourced driver
 OPENRGB_BIN="$WORK/bin/openrgb"
 info() { :; }
 warn() { :; }
@@ -90,6 +91,7 @@ warn() { printf 'warn: %s\n' "$*" >&2; }
 
 export I2C_LOG="$WORK/writes.log"
 : > "$I2C_LOG"
+# shellcheck disable=SC2034  # consumed by the sourced driver
 KF_BUS=0 KF_DELAY_S=0
 kf_off 0x51 0x53 >/dev/null 2>&1
 check "kf_off exits 0 with two Fury controllers" "0" "$?"
@@ -155,6 +157,7 @@ cat > "$WORK/bin/i2cset" <<'EOF'
 exit 1
 EOF
 chmod +x "$WORK/bin/i2cset"
+# shellcheck disable=SC2034  # consumed by the sourced driver
 KF_FAIL=0
 kf_off 0x51 >/dev/null 2>&1
 check "failing bus: exit 1" "1" "$?"

@@ -1,5 +1,7 @@
 # openrgb-oem-fix
-Tested on hp OMEN 45L with kingston Fury RGB RAM
+
+**Status:** works on an HP OMEN MAX 45L (GT23-0xxx) with 2 × 32 GB Kingston
+Fury DDR5 — see [Tested on](#tested-on).
 
 Turn RAM RGB off on Linux desktops where OpenRGB sees nothing at all.
 

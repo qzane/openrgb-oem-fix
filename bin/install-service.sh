@@ -19,17 +19,39 @@ LIB_DIR=/usr/local/lib/openrgb-oem-fix
 UNIT=/etc/systemd/system/openrgb-oem-fix.service
 HOOK=/usr/lib/systemd/system-sleep/openrgb-oem-fix
 
+usage() {
+    cat <<'EOF'
+Usage: sudo install-service.sh [--uninstall]
+
+Install a boot service plus a suspend/resume hook that re-applies
+"RAM RGB off" after every power cycle and every sleep:
+
+  /usr/local/lib/openrgb-oem-fix/                   copy of this repository
+  /etc/systemd/system/openrgb-oem-fix.service       runs rgb-off.sh at boot
+  /usr/lib/systemd/system-sleep/openrgb-oem-fix     runs it pre/post sleep
+
+Options:
+  --uninstall   remove the service, the hook and the copied scripts
+  -h, --help    show this help
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
+    --uninstall)
+        require_root
+        systemctl disable --now openrgb-oem-fix.service >/dev/null 2>&1
+        rm -f "$UNIT" "$HOOK"
+        rm -rf "$LIB_DIR"
+        systemctl daemon-reload
+        log "uninstalled"
+        exit 0
+        ;;
+    "") ;;
+    *) die "unknown option: $1 (try --help)" ;;
+esac
+
 require_root
-
-if [[ "${1:-}" == "--uninstall" ]]; then
-    systemctl disable --now openrgb-oem-fix.service >/dev/null 2>&1
-    rm -f "$UNIT" "$HOOK"
-    rm -rf "$LIB_DIR"
-    systemctl daemon-reload
-    log "uninstalled"
-    exit 0
-fi
-
 command -v systemctl >/dev/null 2>&1 || die "systemd is required"
 
 mkdir -p "$LIB_DIR" "$(dirname -- "$HOOK")"

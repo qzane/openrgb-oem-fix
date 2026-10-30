@@ -23,10 +23,31 @@ MODLOAD=/etc/modules-load.d/openrgb-oem-fix.conf
 BACKUP_DIR=/var/backups/openrgb-oem-fix
 PARAM=acpi_enforce_resources=lax
 
-require_root
+usage() {
+    cat <<'EOF'
+Usage: sudo setup.sh [--revert]
+
+Install the OS-level fixes that make the DIMM SMBus usable by OpenRGB:
+
+  1. kernel parameter acpi_enforce_resources=lax, so i2c-piix4 / i2c-i801 bind
+     even though the firmware declares the SMBus I/O range in an ACPI OpRegion
+     (HP / Dell / Lenovo OEM boards typically do this)
+  2. remove an empty /etc/udev/rules.d/60-openrgb.rules that masks the packaged
+     OpenRGB rules
+  3. load the SMBus and i2c-dev modules at boot
+
+Options:
+  --revert   undo all of the above
+  -h, --help show this help
+
+Reboot after the first run.
+EOF
+}
 
 case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
     --revert)
+        require_root
         rm -f "$DROPIN" "$MODLOAD"
         if [[ -e $BACKUP_DIR/60-openrgb.rules && ! -e $UDEV_RULE ]]; then
             cp -a "$BACKUP_DIR/60-openrgb.rules" "$UDEV_RULE"
@@ -41,13 +62,11 @@ case "${1:-}" in
         log "reverted. Reboot to apply."
         exit 0
         ;;
-    -h|--help)
-        sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
-        exit 0
-        ;;
     "") ;;
     *) die "unknown option: $1 (try --help)" ;;
 esac
+
+require_root
 
 mkdir -p "$BACKUP_DIR"
 
